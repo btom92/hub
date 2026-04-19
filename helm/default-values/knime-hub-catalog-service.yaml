@@ -1,0 +1,51 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+autoscaling:
+  minReplicas: 3
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 75
+  behavior:
+    scaleUp:
+      max: 4
+      periodSeconds: 15
+      policy: Max
+
+deployment:
+  mount_id: knime-business-hub
+  apiKeySecrets:
+    ## The secrets used for the catalog permissions. Existing secret takes precedence over defined api key.
+    ## If neither existingSecret nor apiKey are defined a random secret will be generated.
+    contentImport:
+      enabled: true
+      existingSecret: catalog-service-content-import-api-key
+    fullReadAccess:
+      enabled: true
+      existingSecret: catalog-service-full-read-access-api-key-secret
+    readDiskStorage:
+      enabled: true
+      existingSecret: catalog-service-read-disk-storage-api-key-secret
+    catalogManage:
+      enabled: true
+      existingSecret: catalog-service-catalog-manage-api-key
+    collectionManage:
+      enabled: true
+      existingSecret: catalog-service-collection-manage-api-key
+      apiKey: ""
+  licenseFile:
+    enabled: true
+  jobs_endpoint_enabled: false
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1024Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1536Mi"
+  ## if the following option is true, then the "reset workflow(s) before upload" option in the AP is selected by default,
+  ## and the option is disabled/cannot be changed by the user anymore
+  # workflow_reset_enforce: false
+  ## the following option sets the default value of the "reset workflow(s) before upload" option in AP,
+  ## and will be ignored if workflow
+  # workflow_reset_checkbox_default: true

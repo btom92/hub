@@ -1,0 +1,38 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+autoscaling:
+  minReplicas: 3
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 75
+
+apiKeys:
+  ## only creates secrets with the values set below if createSecrets==true
+  createSecrets: false
+  ## If createSecrets==true, the following values will be used to create the secrets.
+  # randomSecrets: true
+  # notification: replaceme
+  # listing: replaceme
+  # accountCreation: replaceme
+
+licenseFile:
+  enabled: true
+  secretName: "knime-hub-license"
+
+businessHubMetadata:
+  enabled: false
+
+serviceAccount:
+  ## if set to true creates the Role and RoleBinding in the kube-system namespace;
+  ## if set to false a Role needs to be created that allows reading "get" operations on the kube-system namespace resource,
+  ## and a RoleBinding that links this Role to this ServiceAccount
+  createRole: true
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "512Mi"
+  limits:
+    cpu: "1000m"
+    memory: "768Mi"

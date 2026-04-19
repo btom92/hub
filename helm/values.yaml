@@ -1,0 +1,414 @@
+#################
+# ArgoCD Values #
+#################
+
+## ArgoCD configuration.
+## This is where we define the ArgoCD project name, destination server, and other relevant settings.
+## We can also define notifications for ArgoCD events if using the argocd-notifications controller.
+
+argocd:
+  ## ArgoCD project name.
+  projectName: knime-business-hub
+
+  ## Default destination server for all resources.
+  destinationServer: https://kubernetes.default.svc
+
+  ## Default namespace for all ArgoCD Application resources.
+  applicationNamespace: argocd
+
+  ## Optional suffix to append to all ArgoCD Application resource names.
+  ## Will be appended to the application name with a hyphen (e.g. `default-chart-name` --> `default-chart-name-suffix`).
+  applicationNameSuffix: ""
+
+  ## Default OCI registry URL for all Helm charts (Argo CD: repoURL + chart name per Application).
+  ## IMPORTANT: Specify the registry URL WITHOUT the protocol (e.g., use `registry.hubdev.knime.com/knime-hub` instead of `oci://registry.hubdev.knime.com/knime-hub`).
+  defaultRepoURL: registry.hubdev.knime.com/knime-hub
+
+  ## Default sync policy for all ArgoCD Application resources.
+  ## Set `syncPolicy: {}` or `syncPolicy.automated.enabled=false` to turn off auto-sync
+  syncPolicy:
+    automated:
+      enabled: true
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - RespectIgnoreDifferences=true
+    retry:
+      limit: 5
+      backoff:
+        duration: 10s
+        factor: 2
+        maxDuration: 3m
+
+  ## Example notification configuration for Slack.
+  notifications:
+    enabled: true
+    annotations:
+      notifications.argoproj.io/subscribe.on-health-degraded.slack: knime-business-hub-alerts
+      notifications.argoproj.io/subscribe.on-sync-failed.slack: knime-business-hub-alerts
+      notifications.argoproj.io/subscribe.on-deleted.slack: knime-business-hub-alerts
+      notifications.argoproj.io/subscribe.on-created.slack: knime-business-hub-alerts
+
+####################################
+# KNIME Business Hub Global Values #
+####################################
+
+## Global configuration for KNIME Business Hub.
+## This is where we define global settings that are applied to all Helm charts.
+
+global:
+  ## Regardless of where TLS is terminated, so long as TLS is enabled, `.global.tls.enabled` should be set to `true`.
+  tls:
+    enabled: false
+  caCertificate:
+    enabled: false
+    configMapName: knime-business-hub-custom-ca-bundle
+  urls:
+    webapp: hub.example.com
+    dataapps: apps.hub.example.com
+    api: api.hub.example.com
+    auth: auth.hub.example.com
+    websocket: ws.hub.example.com
+    storage: s3.us-east-1.amazonaws.com
+    ## Set webapp_staging which gets forwarded to services as allowed CORS origin / origin whitelist.
+    webapp_staging: localhost,localhost:3000,localhost:4000,127.0.0.1,127.0.0.1:3000,127.0.0.1:4000
+  imageRegistry: registry.hubdev.knime.com/knime-hub
+  imagePullSecrets:
+    - name: regcred
+  metadata:
+    annotations:
+      reloader.stakater.com/auto: "true"
+    labels: {}
+  namespaces:
+    ## Namespace for KNIME Hub core services.
+    core: knime-hub
+    ## Namespace for KNIME Hub executors.
+    execution: knime-hub
+    ## Istio installation namespace.
+    istio: istio-system
+    ## Legacy namespace for KNIME Hub services.
+    hub: knime-hub
+  scheduling:
+    nodeSelector: {}
+    nodeAffinity:
+      ## Define node affinity for core components.
+      core:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+                - key: hub.knime.com/role
+                  operator: In
+                  values:
+                    - core
+      ## Define node affinity for execution components.
+      execution:
+        preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 1
+            preference:
+              matchExpressions:
+                - key: hub.knime.com/role
+                  operator: In
+                  values:
+                    - execution
+    tolerations:
+      ## Define tolerations for core components.
+      core:
+        - key: hub.knime.com/role
+          value: core
+          operator: Equal
+          effect: NoSchedule
+      ## Define tolerations for execution components.
+      execution:
+        - key: hub.knime.com/role
+          value: execution
+          operator: Equal
+          effect: NoSchedule
+  ## Define metrics configuration.
+  metrics:
+    prometheus:
+      serviceMonitor:
+        ## Enables Prometheus ServiceMonitor.
+        enabled: false
+        ## Labels to apply to the ServiceMonitor.
+        ## Example: {"release": "kube-prometheus-stack"}
+        labels:
+          release: kube-prometheus-stack
+      podMonitor:
+        ## Enables Prometheus PodMonitor.
+        enabled: false
+        ## Labels to apply to the PodMonitor.
+        ## Example: {"release": "kube-prometheus-stack"}
+        labels:
+          release: kube-prometheus-stack
+  ## Define PostgreSQL configuration.
+  ## Customer TODO: configure `postgres.clusters` with the PostgreSQL database connection details. Multiple clusters can be defined here if needed.
+  postgres:
+    clusters:
+      default:
+        endpoint: knime-postgres-cluster
+        masterCredentials:
+          secretName: postgres.knime-postgres-cluster.credentials
+          # usernameKey: username
+          # passwordKey: password
+          ## master database to connect to
+          # databaseName: postgres
+        port: 5432
+        ssl:
+          enabled: true
+          mode: require
+      ## Example: create a dedicated Postgres cluster only for the execution database.
+      ## Below you need to assign the execution database to this cluster by setting `.databases.execution.cluster=executionCluster`.
+      # executionCluster:
+      #   endpoint: some-other-rds-endpoint.rds.amazonaws.com
+      #   masterCredentials:
+      #     secretName: rds-execution.master-credentials
+      #   port: 5432
+      #   ssl:
+      #     enabled: true
+      #     mode: require
+    ## Customer TODO: Review the database configuration and update the `cluster` field for each database as needed. The `cluster` field should match one of the clusters defined above (e.g. `default`).
+    ## Note: due to legacy reasons, and helm and kubernetes limitations, the database keys below contain underscores, but secret names contain hyphens!
+    databases:
+      knime:
+        cluster: default
+        database: knime
+        secret:
+          name: knime.knime-postgres-cluster.credentials
+          # usernameKey: username
+          # passwordKey: password
+      keycloak:
+        cluster: default
+        database: keycloak
+        secret:
+          name: keycloak.knime-postgres-cluster.credentials
+      accounts:
+        cluster: default
+        database: accounts
+        secret:
+          name: accounts.knime-postgres-cluster.credentials
+      notification:
+        cluster: default
+        database: notification
+        secret:
+          name: notification.knime-postgres-cluster.credentials
+      execution:
+        cluster: default
+        database: execution
+        secret:
+          name: execution.knime-postgres-cluster.credentials
+      trigger:
+        cluster: default
+        database: trigger
+        secret:
+          name: trigger.knime-postgres-cluster.credentials
+      secret_store:
+        cluster: default
+        database: secret_store
+        secret:
+          name: secret-store.knime-postgres-cluster.credentials
+      session:
+        cluster: default
+        database: session
+        secret:
+          name: session.knime-postgres-cluster.credentials
+      instrumentation_job:
+        cluster: default
+        database: instrumentation_job
+        secret:
+          name: instrumentation-job.knime-postgres-cluster.credentials
+      oauth2_flows:
+        cluster: default
+        database: oauth2_flows
+        secret:
+          name: oauth2-flows.knime-postgres-cluster.credentials
+      validation:
+        cluster: default
+        database: validation
+        secret:
+          name: validation.knime-postgres-cluster.credentials
+      execution_sharing_helper:
+        cluster: default
+        database: execution_sharing_helper
+        secret:
+          name: execution-sharing-helper.knime-postgres-cluster.credentials
+      ai_gateway:
+        cluster: default
+        database: ai_gateway
+        secret:
+          name: ai-gateway.knime-postgres-cluster.credentials
+      ai_service:
+        cluster: default
+        database: ai_service
+        secret:
+          name: ai-service.knime-postgres-cluster.credentials
+      remote_execution_manager:
+        cluster: default
+        database: remote_execution_manager
+        secret:
+          name: remote-execution-manager.knime-postgres-cluster.credentials
+      job_pool_manager:
+        cluster: default
+        database: job_pool_manager
+        secret:
+          name: job-pool-manager.knime-postgres-cluster.credentials
+
+#################################################
+# KNIME Business Hub App-Specific Configuration #
+#################################################
+
+## Configuration for each Helm chart that is deployed as an ArgoCD Application.
+## See helm/argocd-config/argocd-apps.yaml for the ArgoCD Application resources.
+##
+## CONFIGURABLE FIELDS:
+##
+## enabled (bool, optional) - Determines whether the Helm chart is deployed. Useful for disabling charts.
+## targetRevision (string, recommended) - The Helm chart version to deploy.
+## repoURL (string, optional) - Overrides the Helm chart repository URL.
+## chartName (string, optional) - Overrides the Helm chart name (defaults to the application name).
+## helmReleaseName (string, optional) - Overrides the Helm release name.
+## syncWave (int, optional) is used to control the order in which the Helm charts are deployed. Lower values are deployed earlier.
+## syncPolicy (object, optional) is used to control the ArgoCD sync policy for the application.
+## namespace (string, optional) is used to override the namespace that the Helm chart will be deployed to (defaults to the primary namespace configured above).
+## ignoreDifferences (nested mapping, optional) is used to define any chart-specific ignoreDifferences (see https://argo-cd.readthedocs.io/en/stable/user-guide/diffing/).
+## overrides (nested mapping, optional) is used to define any chart-specific values overrides. NOTE: These values are merged with the default values defined in the Helm chart.
+## suppressGlobalValues (bool, optional) - When true, the chart's valuesObject does not include the KNIME global values (e.g. postgres, namespaces, imageRegistry). Only the chart's overrides are passed. Useful for third-party charts that do not expect this chart's global structure. Defaults to false.
+##
+## EXAMPLE CONFIGURATION:
+##
+## knime-hub-some-example-chart:
+##   enabled: true
+##   targetRevision: "2.7.5-stable"
+##   repoURL: registry.hubdev.knime.com/example-project
+##   chartName: knime-hub-some-example-chart
+##   syncWave: 100
+##   syncPolicy:
+##     automated:
+##       enabled: true
+##       prune: true
+##       selfHeal: true
+##     syncOptions:
+##       - RespectIgnoreDifferences=true
+##     retry:
+##       limit: 5
+##       backoff:
+##         duration: 10s
+##         factor: 2
+##         maxDuration: 3m
+##   namespace: knime-hub
+##   ignoreDifferences:
+##     - group: apps
+##       kind: Deployment
+##       jsonPointers:
+##         - /spec/replicas
+##   suppressGlobalValues: false
+##   overrides:
+##     exampleValuesOverride: some-custom-value
+##     exampleValuesOverride2: 42
+##
+## ADDITIONAL CHARTS (user-defined third-party charts):
+## Same field semantics as above (CONFIGURABLE FIELDS). For entries under `additionalCharts`, no default
+## repo or chart is applied: you must set `repoURL` and `targetRevision`; `chartName` defaults to the entry key.
+## Omit `additionalCharts` or leave it empty to deploy only the KNIME charts.
+##
+## additionalCharts:
+##   myCustomChart:
+##     repoURL: https://charts.bitnami.com/bitnami
+##     chartName: postgresql
+##     targetRevision: "15.x"
+##     namespace: knime-hub
+##     syncWave: 105
+##     suppressGlobalValues: false
+##     overrides:
+##       auth:
+##         postgresPassword: ""
+
+additionalCharts: {}
+
+## Customer TODO: Enable and set the TLS certificate configuration as needed.
+knime-hub-business-hub-certificate:
+  overrides:
+    certificate:
+      ## Determines if the TLS secret is created by the chart or provided by the customer.
+      enabled: false
+      ## Retrieve the TLS certificate and private key from a Kubernetes secret.
+      secretName: business-hub-certificate
+      ## Private key and full chain for certificate are expected to be in 'pem' format and base64-encoded.
+      privateKey: ""
+      fullChain: ""
+    customCa:
+      certBundle: ""
+
+## Customer TODO: Optionally disable the external PostgreSQL database initialization jobs. If disabling, the customer is responsible for ensuring that the required databases and roles are created in the PostgreSQL database(s) that are connected to KNIME Business Hub.
+## Configuration for connecting to an external PostgreSQL database.
+## This chart creates secrets with random credentials and sets up the required databases and roles.
+## See README for additional instructions on creating the required secrets in-cluster.
+## This is required for the KNIME Business Hub to function.
+knime-hub-external-postgres:
+  enabled: true
+
+## Customer TODO: Update ingress configuration as needed. The example below is for using the Istio Ingress Gateway (default).
+knime-hub-infrastructure:
+  overrides:
+    ## Ingress is fulfilled by the Istio Ingress Gateway.
+    ingress:
+      enabled: true
+      ## Configuration for the Istio Ingress Class.
+      class:
+        enabled: true
+        name: istio
+        controller: istio.io/ingress-controller
+      ## Configuration for any chart references to the Istio Ingress Gateway service.
+      service:
+        URL: istio-ingressgateway.istio-system.svc.cluster.local
+        httpPort: 80
+        httpsPort: 443
+      ## Configuration for the Istio Ingress Gateway.
+      gateway:
+        enabled: true
+        httpsRedirectEnabled: true
+        tlsTermination:
+          enabled: false
+          mode: SIMPLE
+          ## TLS Secret must exist in the same namespace as the Istio Ingress Gateway.
+          secretName: business-hub-certificate
+
+## Customer TODO: Enable redirection to HTTPS if terminating TLS via the ingress controller.
+knime-hub-keycloak:
+  overrides:
+    ingress:
+      sslRedirect: false
+
+## Customer TODO: Optionally update the site title and logo (base64-encoded SVG).
+knime-hub-webapp:
+  overrides:
+    deployment:
+      customizations:
+        enabled: true
+        site_title: "KNIME Business Hub"
+        # logo_svg: ""
+
+## Customer TODO: Set configuration for the initial execution context.
+## Default execution context configuration. Can be adjusted later in KNIME Business Hub after installation.
+knime-hub-businesshub-init:
+  overrides:
+    execution_context:
+      name: Initial Execution Context
+      image:
+        enableCustomRepository: true
+        customRepository: public.ecr.aws/knime/knime-full
+        tag: r-5.5.1-154
+
+## Customer TODO: The storage class of the Elasticsearch PVC can optionally be customized.
+#knime-hub-elasticsearch:
+#  overrides:
+#    volumeClaimTemplate:
+#      storageClassName: auto-ebs-sc
+
+## Customer TODO: The storage class of the Minio Secret Store can optionally be customized.
+## Customer TODO: Update storage size as needed. 100Gi is the minimum recommended size for KNIME Business Hub.
+knime-hub-secret-store-minio:
+  overrides:
+    persistence:
+      # storageClass: auto-ebs-sc
+      size: 100Gi

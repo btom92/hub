@@ -1,0 +1,23 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+autoscaling:
+  minReplicas: 2
+  maxReplicas: 5
+  targetCPUUtilizationPercentage: 75
+
+resources:
+  requests:
+    cpu: "100m"
+    memory: "1024Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1536Mi"
+
+validationService:
+  enabled: false
+
+licenseFile:
+  enabled: true
+  secretName: knime-hub-license
