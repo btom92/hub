@@ -1,0 +1,32 @@
+{{- range $name, $cfg := .Values.charts }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $name }}
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "{{ $cfg.syncWave | default 300 }}"
+spec:
+  project: {{ $.Values.project | default "default" }}
+  source:
+    repoURL: {{ $.Values.repoURL }}
+    chart: {{ $cfg.chartName | default $name }}
+    targetRevision: {{ $cfg.targetRevision }}
+    helm:
+      valueFiles:
+        - ../../default-values/{{ $name }}.yaml
+        - ../../local-values.yaml
+  destination:
+    server: {{ $.Values.destinationServer }}
+    namespace: {{ $cfg.namespace | default $.Values.destinationNamespace }}
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+{{- if $cfg.ignoreDifferences }}
+  ignoreDifferences:
+{{ toYaml $cfg.ignoreDifferences | indent 4 }}
+{{- end }}
+
+---
+{{- end }}
