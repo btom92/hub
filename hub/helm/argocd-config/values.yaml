@@ -1,0 +1,10 @@
+knime:
+  version: "1.18.1"
+
+  ociRegistry: "registry.hubdev.knime.com/knime-hub"
+
+  namespace: "knime-business-hub"
+
+  # GitHub repo, ahol ez a chart van
+  repoUrl: "https://github.com/btom92/hub"
+  repoPath: "helm/argocd-config"
