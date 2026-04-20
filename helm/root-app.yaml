@@ -1,0 +1,88 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: knime-business-hub
+  namespace: argocd
+  finalizers:
+    - argocd.argoproj.io/resources-finalizer
+spec:
+  project: knime-business-hub
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+
+  source:
+    repoURL: registry.hubdev.knime.com/knime-hub
+    chart: knime-hub-argocd-config
+    targetRevision: 1.19.0   # ha más verziót kaptál, írd át
+    helm:
+      valuesObject:
+        argocd:
+          projectName: knime-business-hub
+          destinationServer: https://kubernetes.default.svc
+          applicationNamespace: argocd
+          defaultRepoURL: registry.hubdev.knime.com/knime-hub
+
+        global:
+          tls:
+            enabled: false
+          urls:
+            webapp: knime.hub.bodortamas.hu
+            dataapps: apps.knime.hub.bodortamas.hu
+            api: api.knime.hub.bodortamas.hu
+            auth: auth.knime.hub.bodortamas.hu
+            websocket: ws.knime.hub.bodortamas.hu
+            storage: s3.us-east-1.amazonaws.com
+          imageRegistry: registry.hubdev.knime.com/knime-hub
+          imagePullSecrets:
+            - name: regcred
+          postgres:
+            clusters:
+              default:
+                endpoint: knimehub.ccp8km28kh74.us-east-1.rds.amazonaws.com
+                masterCredentials:
+                  secretName: postgres.knime-postgres-cluster.credentials
+                port: 5432
+                ssl:
+                  enabled: true
+                  mode: require
+
+        knime-hub-catalog-service:
+          overrides:
+            s3:
+              bucket: knimehub-catalog-service
+              region: us-east-1
+              credentialsSecretName: s3-credentials
+
+        knime-hub-accounts-service:
+          overrides:
+            s3:
+              bucket: knimehub-avatars
+              region: us-east-1
+              credentialsSecretName: s3-credentials
+
+        knime-hub-execution-service:
+          overrides:
+            s3:
+              bucket: knimehub-execution-jobs
+              region: us-east-1
+              credentialsSecretName: s3-credentials
+
+        knime-hub-customization-profiles:
+          overrides:
+            s3:
+              bucket: knimehub-customization-profiles-new
+              region: us-east-1
+              credentialsSecretName: s3-credentials
+
+        knime-hub-secret-store-service:
+          overrides:
+            s3:
+              bucket: knimehub-secret-store-service
+              region: us-east-1
+              credentialsSecretName: s3-credentials
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
