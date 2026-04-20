@@ -1,0 +1,164 @@
+## This template generates ArgoCD Application resources for each application that is enabled.
+
+## Get the Helm charts to be deployed.
+{{- $argoAppConfig := fromYaml ($.Files.Get "argocd-config/argocd-apps.yaml") }}
+
+## Range over each individual Helm chart for the purpose of defining an ArgoCD Application.
+{{- range $appName, $defaultAppConfig := $argoAppConfig.charts }}
+
+## Retrieve the default configuration for the application.
+{{- $defaultValuesFile := printf "default-values/%s.yaml" $appName }}
+{{- $defaultValues := fromYaml (default "{}" ($.Files.Get $defaultValuesFile)) }}
+
+## Merge the default configuration values with the user-provided configuration.
+{{- $userConfig := index $.Values $appName }}
+{{- $mergedConfig := mergeOverwrite (deepCopy $defaultAppConfig) (default dict $userConfig) }}
+{{- $mergedValues :=  mergeOverwrite (deepCopy $defaultValues) (default dict $userConfig.overrides) }}
+
+## Render the ArgoCD Application resource (if it is enabled).
+{{- if ne $mergedConfig.enabled false }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $appName }}{{- if $.Values.argocd.applicationNameSuffix }}-{{ $.Values.argocd.applicationNameSuffix }}{{- end }}
+  namespace: {{ $.Values.argocd.applicationNamespace }}
+  annotations:
+    argocd.argoproj.io/compare-options: ServerSideDiff=true
+    {{- if $mergedConfig.syncWave }}
+    argocd.argoproj.io/sync-wave: "{{ $mergedConfig.syncWave | toString }}"
+    {{- end }}
+    {{- if $.Values.argocd.notifications.enabled }}
+    {{- $.Values.argocd.notifications.annotations | toYaml | nindent 4 }}
+    {{- end }}
+  ## Add finalizers to ensure that resources are cleaned up when the application is deleted.
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io/background
+spec:
+  destination:
+    {{- if $mergedConfig.namespace }}
+    namespace: {{ $mergedConfig.namespace }}
+    {{- else }}
+    namespace: {{ $.Values.global.namespaces.core }}
+    {{- end }}
+    server: {{ $.Values.argocd.destinationServer }}
+  project: {{ $.Values.argocd.projectName }}
+  source:
+    {{- if $mergedConfig.chartName }}
+    chart: {{ $mergedConfig.chartName }}
+    {{- else }}
+    chart: {{ $appName }}
+    {{- end }}
+    {{- if $mergedConfig.repoURL }}
+    repoURL: {{ $mergedConfig.repoURL }}
+    {{- else }}
+    repoURL: {{ $.Values.argocd.defaultRepoURL | trim | quote }}
+    {{- end }}
+    targetRevision: {{ default "latest" $mergedConfig.targetRevision | trim | quote }}
+    helm:
+      {{- if $mergedConfig.helmReleaseName }}
+      releaseName: {{ $mergedConfig.helmReleaseName | trim | quote  }}
+      {{- end }}
+      valuesObject:
+        {{- if $mergedConfig.suppressGlobalValues }}
+        {{- $mergedValues | toYaml | nindent 8 }}
+        {{- else }}
+        ## Global overrides.
+        global:
+          {{- /* Create temporary dict with syncWave annotation if exists */}}
+          {{- $syncWaveAnnotation := dict }}
+          {{- if $mergedConfig.syncWave }}
+            {{-   $_ := set $syncWaveAnnotation "metadata" (dict "annotations" (dict "argocd.argoproj.io/sync-wave" (toString $mergedConfig.syncWave))) }}
+          {{- end }}
+          {{- mergeOverwrite (mergeOverwrite (dict) $.Values.global $syncWaveAnnotation) (pluck "global" $mergedValues | first) | toYaml | nindent 10 }}
+          {{- if $mergedValues }}
+          ## Application-specific overrides.
+          {{- omit $mergedValues "global" | toYaml | nindent 8 }}
+          {{- end }}
+        {{- end }}
+  syncPolicy:
+    {{- if $mergedConfig.syncPolicy }}
+    {{- $mergedConfig.syncPolicy | toYaml | nindent 4 }}
+    {{- else }}
+    {{- $.Values.argocd.syncPolicy | toYaml | nindent 4 }}
+    {{- end }}
+  {{- if $mergedConfig.ignoreDifferences }}
+  ignoreDifferences: {{ $mergedConfig.ignoreDifferences | toYaml | nindent 2 }}
+{{- end }}
+---
+{{- end }}
+{{- end }}
+
+{{- /* Additional (user-defined) Helm charts: same Application spec, config from values.additionalCharts only. */}}
+{{- $defaultAdditionalConfig := dict "namespace" (index $.Values.global.namespaces "core") "syncPolicy" $.Values.argocd.syncPolicy }}
+{{- range $appName, $userAppConfig := default dict $.Values.additionalCharts }}
+{{- $mergedConfig := mergeOverwrite (deepCopy $defaultAdditionalConfig) (deepCopy $userAppConfig) }}
+{{- $mergedValues := default dict $userAppConfig.overrides }}
+{{- if ne $mergedConfig.enabled false }}
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{ $appName }}{{- if $.Values.argocd.applicationNameSuffix }}-{{ $.Values.argocd.applicationNameSuffix }}{{- end }}
+  namespace: {{ $.Values.argocd.applicationNamespace }}
+  annotations:
+    argocd.argoproj.io/compare-options: ServerSideDiff=true
+    {{- if $mergedConfig.syncWave }}
+    argocd.argoproj.io/sync-wave: "{{ $mergedConfig.syncWave | toString }}"
+    {{- end }}
+    {{- if $.Values.argocd.notifications.enabled }}
+    {{- $.Values.argocd.notifications.annotations | toYaml | nindent 4 }}
+    {{- end }}
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io/background
+spec:
+  destination:
+    {{- if $mergedConfig.namespace }}
+    namespace: {{ $mergedConfig.namespace }}
+    {{- else }}
+    namespace: {{ $.Values.global.namespaces.core }}
+    {{- end }}
+    server: {{ $.Values.argocd.destinationServer }}
+  project: {{ $.Values.argocd.projectName }}
+  source:
+    {{- if $mergedConfig.chartName }}
+    chart: {{ $mergedConfig.chartName }}
+    {{- else }}
+    chart: {{ $appName }}
+    {{- end }}
+    {{- if $mergedConfig.repoURL }}
+    repoURL: {{ $mergedConfig.repoURL }}
+    {{- else }}
+    repoURL: {{ $.Values.argocd.defaultRepoURL | trim | quote }}
+    {{- end }}
+    targetRevision: {{ default "latest" $mergedConfig.targetRevision | trim | quote }}
+    helm:
+      {{- if $mergedConfig.helmReleaseName }}
+      releaseName: {{ $mergedConfig.helmReleaseName | trim | quote  }}
+      {{- end }}
+      valuesObject:
+        {{- if $mergedConfig.suppressGlobalValues }}
+        {{- $mergedValues | toYaml | nindent 8 }}
+        {{- else }}
+        global:
+          ## Global overrides.
+          {{- $syncWaveAnnotation := dict }}
+          {{- if $mergedConfig.syncWave }}
+            {{- $_ := set $syncWaveAnnotation "metadata" (dict "annotations" (dict "argocd.argoproj.io/sync-wave" (toString $mergedConfig.syncWave))) }}
+          {{- end }}
+          {{- mergeOverwrite (mergeOverwrite (dict) $.Values.global $syncWaveAnnotation) (pluck "global" $mergedValues | first) | toYaml | nindent 10 }}
+          {{- if $mergedValues }}
+          ## Application-specific overrides.
+          {{- omit $mergedValues "global" | toYaml | nindent 8 }}
+          {{- end }}
+        {{- end }}
+  syncPolicy:
+    {{- if $mergedConfig.syncPolicy }}
+    {{- $mergedConfig.syncPolicy | toYaml | nindent 4 }}
+    {{- else }}
+    {{- $.Values.argocd.syncPolicy | toYaml | nindent 4 }}
+    {{- end }}
+  {{- if $mergedConfig.ignoreDifferences }}
+  ignoreDifferences: {{ $mergedConfig.ignoreDifferences | toYaml | nindent 2 }}
+  {{- end }}
+---
+{{- end }}
+{{- end }}
