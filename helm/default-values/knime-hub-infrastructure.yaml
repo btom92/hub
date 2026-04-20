@@ -1,0 +1,47 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+## IMPORTANT SETTING - DO NOT OVERRIDE
+## This setting ensures that namespace(s) are not deleted when uninstalling this chart.
+## Setting this to true could result in the deletion of the knime-hub namespace and all resources within it.
+createNamespace: false
+
+## Ingress is fulfilled by the Istio Ingress Gateway.
+ingress:
+  ## Configuration for the Istio Ingress Class.
+  class:
+    enabled: true
+    name: istio
+    controller: istio.io/ingress-controller
+  ## Configuration for any chart references to the Istio Ingress Gateway service.
+  service:
+    URL: istio-ingressgateway.istio-system.svc.cluster.local
+    httpPort: 80
+    httpsPort: 443
+  ## Configuration for the Istio Ingress Gateway.
+  gateway:
+    enabled: true
+    httpsRedirectEnabled: true
+    tlsTermination:
+      enabled: false
+      mode: SIMPLE
+      ## TLS Secret must exist in the same namespace as the Istio Ingress Gateway.
+      secretName: business-hub-certificate
+
+## Redirects certain outbound traffic from the Istio service mesh back to the KNIME Hub ingress controller.
+## If traffic is not redirected, external DNS must be configured and accessible from the cluster.
+## Affects URLs such as api.hub.example.com and auth.hub.example.com.
+istio_outbound_redirect:
+  enabled: false
+
+## Enables Ingress and SecretConfig resources for MinIO but relies on the secrets to be created elsewhere.
+minio:
+  offloaded: true
+  enabled: false
+  createSecrets: false
+  ingress:
+    enabled: false
+
+httpCompression:
+  enabled: true

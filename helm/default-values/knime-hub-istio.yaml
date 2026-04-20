@@ -1,0 +1,53 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+global:
+  imagePullSecrets:
+    - regcred
+  proxy:
+    image: "registry.hubdev.knime.com/knime-hub/istio/proxyv2:1.28.3"
+  proxy_init:
+    image: "registry.hubdev.knime.com/knime-hub/istio/proxyv2:1.28.3"
+
+cni:
+  image: "registry.hubdev.knime.com/knime-hub/istio/install-cni:1.28.3"
+
+base:
+  base:
+    enableCRDTemplates: false
+    excludedCRDs: []
+
+istiod:
+  image: "registry.hubdev.knime.com/knime-hub/istio/pilot:1.28.3"
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution: null
+      preferredDuringSchedulingIgnoredDuringExecution:
+        - weight: 1
+          preference:
+            matchExpressions:
+              - key: hub.knime.com/role
+                operator: In
+                values:
+                  - core
+  cni:
+    enabled: true
+    autoscaleMin: 1
+    autoscaleMax: 1
+
+  meshConfig:
+    extensionProviders:
+      - name: "auth-exchanger"
+        envoyExtAuthzHttp:
+          service: 'auth-exchanger.knime-hub.svc.cluster.local'
+          port: "9090"
+          includeRequestHeadersInCheck: [ "authorization", "user-agent", "x-forwarded-for", "cookie" ]
+          headersToUpstreamOnAllow: [ "authorization", "x-auth-exchanger", "cookie" ]
+          pathPrefix: "/check"
+          timeout: 5s
+
+builder:
+  istiod:
+    cni:
+      enabled: true

@@ -1,0 +1,28 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+deployment:
+  elasticsearch_url: elasticsearch-master:9200
+  catalog_service_mp_rest_url: http://catalog-service:9080/catalog
+  resources:
+    requests:
+      cpu: "25m"
+      memory: "1024Mi"
+    limits:
+      cpu: "1000m"
+      memory: "1536Mi"
+
+licenseFile:
+  enabled: true
+  secretName: "knime-hub-license"
+
+init:
+  waitforelasticsearch:
+    securityContext:
+      runAsUser: 1337
+      runAsGroup: 1337
+  waitforcatalogservice:
+    securityContext:
+      runAsUser: 1337
+      runAsGroup: 1337

@@ -1,0 +1,20 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+config:
+  llms:
+    apiType: open_ai
+    openai:
+      gpt35Model: "gpt-4.1-nano"
+      gpt4Model: "gpt-5.4"
+      embeddingsModel: "text-embedding-3-small"
+  history:
+    retention_days: 90
+    nats: "nats://nats.knime-hub.svc.cluster.local:4222"
+  qa:
+    content:
+      workflows: false
+      components: false
+  postgres:
+    secretName: ai-service.knime-postgres-cluster.credentials
