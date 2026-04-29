@@ -1,7 +1,18 @@
 keycloak:
   knime_admin_username: "admin"
   knime_admin_temp_password: "20knime16"
-keycloakRealmOperator:
+
   image:
-    repository: registry.hubdev.knime.com/knime-hub/keycloak-realm-operator
-    tag: "1.2.1-6762f61"
+    repository: registry.hubdev.knime.com/knime-hub/keycloak
+    tag: "26.1.4"
+
+  initContainers:
+    keycloakInit:
+      image:
+        repository: registry.hubdev.knime.com/knime-hub/keycloak-init
+        tag: "26.1.4"
+
+    keycloakExtensionsInit:
+      image:
+        repository: registry.hubdev.knime.com/knime-hub/knime-hub-keycloak-extensions-init
+        tag: "26.1.4-stable-0022-ad8f057"
