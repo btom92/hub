@@ -1,0 +1,30 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+config:
+  httpEndpoints:
+    natsEndpoints:
+      - path: secret-store
+        stream: "audit_secret-store"
+        description: "Secret Store audit events"
+        filtersAllowed: true
+      - path: accounts-users
+        stream: "artemis-nats-bridge-accounts-users-messages"
+        description: "Account Events - Users"
+        filtersAllowed: true
+      - path: accounts-teams
+        stream: "artemis-nats-bridge-accounts-teams-messages"
+        description: "Account Events - Teams"
+        filtersAllowed: true
+      - path: accounts-groups
+        stream: "artemis-nats-bridge-accounts-groups-messages"
+        description: "Account Events - Groups"
+        filtersAllowed: true
+      - path: ai
+        stream: "ai"
+        description: "AI Events"
+        filtersAllowed: true
+      - path: catalog-repository-items
+        stream: "artemis-nats-bridge-catalog-repository-items"
+        description: "Catalog Events - Repository Items"
+        filtersAllowed: true

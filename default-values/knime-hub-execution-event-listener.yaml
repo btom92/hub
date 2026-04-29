@@ -1,0 +1,8 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+executionContext:
+  deploymentStrategy: RollingUpdate
+  startupTimeoutSeconds: 300
+  customImagePullSecret: regcred
