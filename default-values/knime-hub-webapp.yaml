@@ -5,7 +5,7 @@
 deployment:
   customizations:
     enabled: true
-    site_title: KNIME Business Hub
+    site_title: Insight Business Hub
   enableDataApps: true
   enableAiModels: false
   x_frame_options: SAMEORIGIN
