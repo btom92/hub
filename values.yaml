@@ -1,0 +1,3 @@
+keycloak:
+  knime_admin_username: "admin"
+  knime_admin_temp_password: "20knime16"
