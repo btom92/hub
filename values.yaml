@@ -64,11 +64,11 @@ global:
     enabled: false
     configMapName: knime-business-hub-custom-ca-bundle
   urls:
-    webapp: hub.example.com
-    dataapps: apps.hub.example.com
-    api: api.hub.example.com
-    auth: auth.hub.example.com
-    websocket: ws.hub.example.com
+    webapp: knime.hub.bodortamas.hu
+    dataapps: apps.knime.hub.bodortamas.hu
+    api: api.knime.hub.bodortamas.hu
+    auth: auth.knime.hub.bodortamas.hu
+    websocket: ws.knime.hub.bodortamas.hu
     storage: s3.us-east-1.amazonaws.com
     ## Set webapp_staging which gets forwarded to services as allowed CORS origin / origin whitelist.
     webapp_staging: localhost,localhost:3000,localhost:4000,127.0.0.1,127.0.0.1:3000,127.0.0.1:4000
