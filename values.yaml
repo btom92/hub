@@ -135,10 +135,6 @@ global:
         ssl:
           enabled: true
           mode: require
-knime-hub-infrastructure:
-  overrides:
-    postgres:
-      externalName: knimehub-postgres-v2.ccp8km28kh74.us-east-1.rds.amazonaws.com
       ## Example: create a dedicated Postgres cluster only for the execution database.
       ## Below you need to assign the execution database to this cluster by setting `.databases.execution.cluster=executionCluster`.
       # executionCluster:
