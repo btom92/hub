@@ -359,3 +359,8 @@ knime-hub-secret-store-minio:
       # storageClass: auto-ebs-sc #e.g. this one for eks auto mode
       ## Customer TODO: Update storage size as needed. 100Gi is the minimum recommended size for KNIME Business Hub.
       size: 100Gi
+
+knime-hub-istio-ingressgateway:
+  overrides:
+    service:
+      type: LoadBalancer
