@@ -1,0 +1,340 @@
+charts:
+  knime-hub-accounts-service:
+    targetRevision: 2.14.2-stable-0014-eeb6ff90-034bf8d
+    chartName: knime-helm-accounts-service
+    syncWave: 321
+  knime-hub-activemq-artemis:
+    targetRevision: 2.52.0-stable-0025-2ea2b51-60056fd
+    chartName: activemq-artemis
+    syncWave: 318
+    ignoreDifferences:
+      - kind: Secret
+        name: knime.artemis.credentials
+        jsonPointers:
+          - /data/password
+  knime-hub-ai-gateway:
+    targetRevision: 2.1.0-stable-0005-cb0263d-d9073c3
+    syncWave: 322
+  knime-hub-ai-history-service:
+    targetRevision: 1.5.0-stable-0002-88a32fa-1592925
+    syncWave: 322
+  knime-hub-ai-service:
+    targetRevision: 1.10.1-stable-0004-d22314a-4b26f81
+    syncWave: 322
+  knime-hub-ap-loader:
+    targetRevision: 1.10.0-stable-000002-a444d49-593eead
+    syncWave: 330
+  knime-hub-artemis-nats-bridge:
+    targetRevision: 1.6.0-stable-0105-26c5fe3-d35820f
+    syncWave: 320
+  knime-hub-artifacts:
+    targetRevision: 0.18.1-stable-0203-85b9fdf-c7994a9
+    syncWave: 322
+  knime-hub-artifacts-zipper:
+    targetRevision: 1.9.0-stable-0113-a7eea8d-6da5a96
+    syncWave: 323
+  knime-hub-auth-exchanger:
+    targetRevision: 1.7.0-stable-0115-bc4ba23-e89aab6
+    chartName: knime-helm-auth-exchanger
+    syncWave: 330
+  knime-hub-auth-rely:
+    targetRevision: 1.6.1-stable-0213-38041c1-415d860
+    syncWave: 330
+  knime-hub-avatars:
+    targetRevision: 1.0.3-stable-0040-1d14f7a-73167db
+    syncWave: 330
+  knime-hub-business-hub-certificate:
+    targetRevision: 0.1.0-184a149
+    syncWave: 315
+  knime-hub-businesshub-init:
+    targetRevision: 0.4.1-stable-0033-b21b85a-1e5cd6e
+    syncWave: 340
+  knime-hub-catalog-service:
+    targetRevision: 4.41.0-stable-0002-e204e686c-fac64fb
+    chartName: knime-helm-catalog-service
+    syncWave: 323
+  knime-hub-content-importer:
+    targetRevision: 0.2.3-stable-0041-890fda0-01edfdd
+    chartName: knime-hub-content-import
+    syncWave: 330
+  knime-hub-crd-updater:
+    targetRevision: 0.5.1-stable-0019-ec7d4b8-a23d7f9
+    syncWave: 100
+  knime-hub-elasticsearch:
+    targetRevision: 8.19.3-04f6fdf
+    syncWave: 320
+    ignoreDifferences:
+      - kind: Secret
+        name: elasticsearch-master-credentials
+        jsonPointers:
+          - /data/password
+  knime-hub-endpoint-status-tracker:
+    targetRevision: 0.2.0-stable-0039-5b502dc-ea58675
+    syncWave: 220
+  knime-hub-event-dispatcher:
+    targetRevision: 2.2.0-stable-0004-282445f-6c8014a
+    syncWave: 330
+  knime-hub-execution-context-manager:
+    targetRevision: 1.1.0-stable-0078-718141e-ceb2452
+    syncWave: 330
+  knime-hub-execution-event-listener:
+    targetRevision: 1.1.0-stable-0104-e949d5c-7bf46cb
+    syncWave: 330
+  knime-hub-execution-keycloak-proxy:
+    targetRevision: 3.7.1-stable-0188-bbeccac-527d13c
+    syncWave: 330
+  knime-hub-execution-lifecycle-handler:
+    targetRevision: 2.13.0-stable-0010-a586c60-ef3edf9
+    syncWave: 330
+  knime-hub-execution-log-service:
+    targetRevision: 1.3.0-stable-0131-dbfe852-1900f8f
+    syncWave: 330
+    ignoreDifferences:
+      - kind: Secret
+        name: log-writer-credentials
+        jsonPointers:
+          - /data/password
+  knime-hub-execution-operator:
+    targetRevision: 2.0.1-stable-0179-45cc343-478c363
+    syncWave: 330
+  knime-hub-execution-post-execution-handler:
+    targetRevision: 2.12.0-stable-0006-b9bc05b-cdf2376
+    syncWave: 330
+  knime-hub-execution-rest-interface:
+    targetRevision: 2.17.2-stable-0016-3241ad81-fec0978
+    syncWave: 330
+  knime-hub-execution-s3-proxy:
+    targetRevision: 1.9.2-stable-0155-394a7c4-227b86e
+    syncWave: 330
+  knime-hub-execution-schedule-handler:
+    targetRevision: 2.12.0-stable-0008-0a9f55c-34c714c
+    syncWave: 330
+  knime-hub-execution-sharing-helper:
+    targetRevision: 1.2.0-stable-0054-6840009-7a9de5a
+    syncWave: 330
+  knime-hub-execution-state-persistor:
+    targetRevision: 2.13.0-stable-0005-37a897e-a3bb729
+    syncWave: 330
+  knime-hub-execution-trigger-service:
+    targetRevision: 2.10.0-stable-0003-05647dd-272c5ed
+    syncWave: 330
+    ignoreDifferences:
+      - group: apps
+        kind: Deployment
+        jsonPointers:
+          - /spec/template/spec/nodeSelector
+  knime-hub-execution-webapp:
+    targetRevision: 1.9.3-stable-000006-5013308-cce636d
+    syncWave: 350
+  knime-hub-external-postgres:
+    targetRevision: 1.0.2-stable-0008-a07b04c-ed2ae85
+    syncWave: 110
+  knime-hub-grafana:
+    targetRevision: 0.1.0-086e6d9
+    chartName: knime-business-hub-grafana
+    syncWave: 330
+  knime-hub-image-builder-service:
+    targetRevision: 0.1.0-stable-0022-ecdaeff-8196765
+    syncWave: 330
+  knime-hub-infrastructure:
+    targetRevision: 0.7.0-d08ec43
+    syncWave: 200
+  knime-hub-instrumentation-job-service:
+    targetRevision: 1.17.0-stable-0002-e2c0010-f62ca82
+    syncWave: 330
+  knime-hub-istio:
+    targetRevision: 1.28.3-da147b3
+    syncWave: 180
+    namespace: istio-system
+    ignoreDifferences:
+      - group: admissionregistration.k8s.io
+        kind: ValidatingWebhookConfiguration
+        name: istiod-istio-system
+        jsonPointers:
+          - /webhooks/0/failurePolicy
+      - group: admissionregistration.k8s.io
+        kind: ValidatingWebhookConfiguration
+        name: istio-validator-istio-system
+        jsonPointers:
+          - /webhooks/0/failurePolicy
+      - group: admissionregistration.k8s.io
+        kind: ValidatingWebhookConfiguration
+        name: istiod-default-validator
+        jsonPointers:
+          - /webhooks/0/failurePolicy
+  knime-hub-istio-egressgateway:
+    targetRevision: 1.28.3-15179c3
+    chartName: knime-hub-istio-egressgateway
+    syncWave: 185
+    namespace: istio-system
+  knime-hub-istio-ingressgateway:
+    targetRevision: 1.28.3-e60db43
+    chartName: knime-hub-istio-gateway
+    syncWave: 185
+    namespace: istio-system
+  knime-hub-keycloak:
+    targetRevision: 1.2.4-0ccb959
+    syncWave: 317
+  knime-hub-keycloak-migration:
+    targetRevision: 1.0.0-stable-0010-c07f379-0abdb0b
+    syncWave: 318
+  knime-hub-keycloak-operator:
+    targetRevision: 1.2.1-6762f61
+    chartName: knime-keycloak-operator
+    syncWave: 310
+  knime-hub-kubernetes-event-persistor:
+    targetRevision: 1.2.0-stable-0056-66e82da-d6e60be
+    syncWave: 330
+  knime-hub-nats:
+    targetRevision: 2.12.3-201da81
+    chartName: nats
+    helmReleaseName: nats
+    syncWave: 319
+    ignoreDifferences:
+      - kind: Secret
+        name: nats-auth-credentials
+        jsonPointers:
+          - /data/password
+          - /data/quotedPassword
+  knime-hub-nats-auth:
+    targetRevision: 1.1.0-stable-0048-8ceaa2a-477ec8a
+    syncWave: 320
+    ignoreDifferences:
+      - kind: Secret
+        name: nats-audit-credentials
+        jsonPointers:
+          - /data/PASSWORD_NATS_AUDIT
+      - kind: Secret
+        name: nats-jetstream-controller-credentials
+        jsonPointers:
+          - /data/PASSWORD_NATS_JETSTREAM_CONTROLLER
+  knime-hub-nats-jetstream-controller:
+    targetRevision: 0.31.1-7e9c5f5
+    chartName: nats-jetstream-controller
+    syncWave: 321
+  knime-hub-nats-rest-gateway:
+    targetRevision: 1.2.2-stable-0059-5219312-df84855
+    syncWave: 322
+  knime-hub-notification-service:
+    enabled: false
+    targetRevision: 8.0.0-stable-0005-52f927c-7d34122
+    chartName: knime-helm-notification-service
+    syncWave: 330
+  knime-hub-oauth2-flow-service:
+    targetRevision: 2.9.0-stable-0003-7d85fcc-2e98f1c
+    syncWave: 330
+    ignoreDifferences:
+      - group: apps
+        kind: Deployment
+        jsonPointers:
+          - /spec/template/spec/nodeSelector
+  knime-hub-persistence:
+    targetRevision: 0.3.15-88991b4
+    syncWave: 301
+  knime-hub-reloader:
+    targetRevision: 2.1.3
+    chartName: reloader
+    syncWave: 330
+  knime-hub-remote-execution-manager:
+    enabled: false
+    targetRevision: 0.3.0-stable-0029-95dbec2-71113f2
+    syncWave: 330
+  knime-hub-search-service:
+    targetRevision: 2.21.1-stable-0005-77ac3cc-fa43b62
+    chartName: knime-helm-search-service
+    syncWave: 330
+  knime-hub-search-sync-service:
+    targetRevision: 2.20.0-stable-0002-3129c1b-50e1671
+    chartName: knime-helm-search-sync-service
+    syncWave: 330
+  knime-hub-secret-generator:
+    targetRevision: 0.1.2-1695b75
+    syncWave: 110
+    ignoreDifferences:
+      - kind: Secret
+        name: accounts-service-listing-api-key
+        jsonPointers:
+          - /data/apiKey
+      - kind: Secret
+        name: accounts-service-account-creation-api-key
+        jsonPointers:
+          - /data/apiKey
+      - kind: Secret
+        name: auth-rely-cookie-secret
+        jsonPointers:
+          - /data/hashKey
+          - /data/blockKey
+      - kind: Secret
+        name: catalog-service-content-import-api-key
+        jsonPointers:
+          - /data/apiKey
+      - kind: Secret
+        name: catalog-service-collection-manage-api-key
+        jsonPointers:
+          - /data/apiKey
+      - kind: Secret
+        name: catalog-service-full-read-access-api-key-secret
+        jsonPointers:
+          - /data/apiKey
+      - kind: Secret
+        name: catalog-service-read-disk-storage-api-key-secret
+        jsonPointers:
+          - /data/apiKey
+      - kind: Secret
+        name: catalog-service-catalog-manage-api-key
+        jsonPointers:
+          - /data/apiKey
+      - kind: Secret
+        name: catalog-service-catalog-manage-api-key
+        jsonPointers:
+          - /data/apiKey
+      - kind: Secret
+        name: catalog-service-catalog-manage-api-key
+        jsonPointers:
+          - /data/apiKey
+      - kind: Secret
+        name: secret-store-vault-credentials
+        jsonPointers:
+          - /data/secretId
+      - kind: Secret
+        name: postgres-backup-minio-credentials
+        jsonPointers:
+          - /data/secretAccessKey
+      - kind: Secret
+        name: example-api-key-secret
+        jsonPointers:
+          - /data/API_KEY
+      - kind: Secret
+        name: example-postgres-secret
+        jsonPointers:
+          - /data/DB_PASSWORD
+  knime-hub-secret-operator:
+    targetRevision: 0.3.0-stable-0040-a664d0f-577b01c
+    chartName: knime-secret-operator
+    syncWave: 200
+  knime-hub-secret-store:
+    targetRevision: 2.12.6-stable-0025-2daf69c-4d7bbb0
+    syncWave: 330
+  knime-hub-secret-store-kes:
+    targetRevision: 1.1.7-bd12d74
+    syncWave: 330
+  knime-hub-secret-store-minio:
+    targetRevision: 3.7.0-8099295
+    chartName: minio
+    syncWave: 120
+  knime-hub-session-service:
+    targetRevision: 1.11.2-stable-0012-5bfe0a5-9600dec
+    syncWave: 350
+  knime-hub-swagger:
+    targetRevision: 1.4.3-stable-0091-d38ad1b-27ab15f
+    syncWave: 330
+  knime-hub-validation:
+    targetRevision: 1.3.0-stable-0074-62d2606-e892cc8
+    syncWave: 330
+  knime-hub-webapp:
+    targetRevision: 7.35.1-stable-000010-05222350e-9766e3d
+    chartName: knime-helm-hub-webapp
+    syncWave: 330
+  knime-hub-websocket-proxy:
+    targetRevision: 2.0.3-stable-0188-29d26a0-150cd7f
+    syncWave: 350
