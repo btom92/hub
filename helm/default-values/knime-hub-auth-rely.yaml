@@ -1,0 +1,7 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+## Secret will be created by the knime-hub-secret-generator chart.
+cookieSecret:
+  createSecrets: false

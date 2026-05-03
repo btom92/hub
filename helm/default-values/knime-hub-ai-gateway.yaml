@@ -1,0 +1,7 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+config:
+  messagebroker:
+    url: "nats://nats.knime-hub.svc.cluster.local:4222"

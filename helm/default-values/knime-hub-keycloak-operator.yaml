@@ -1,0 +1,19 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+keycloak:
+  realm_display_name: KNIME Business Hub
+  replicaCount: 3
+
+  ## KNIME TODO: Replace with optional generated secret.
+  knime_admin_username: knimeadmin
+  knime_admin_temp_password: knime
+
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "1024Mi"
+    limits:
+      cpu: "2000m"
+      memory: "1024Mi"
