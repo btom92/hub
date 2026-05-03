@@ -1,0 +1,7 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+config:
+  job:
+    info_expiration: 30D

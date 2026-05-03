@@ -1,0 +1,80 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+image: "registry.hubdev.knime.com/knime-hub/elasticsearch"
+imagePullSecrets:
+  - name: regcred
+resources:
+  requests:
+    cpu: "1000m"
+    memory: "2Gi"
+  limits:
+    cpu: "2000m"
+    memory: "2Gi"
+extraEnvs:
+  - name: http.max_content_length
+    value: 500mb
+
+## Set pod anti-affinity to "soft" to allow for scheduling in smaller clusters.
+## Uses kubernetes.io/hostname as the topology key by default.
+## Set to "hard" to enforce anti-affinity.
+## Possible values: "hard", "soft".
+##
+## IMPORTANT: Risks when using "soft" anti-affinity:
+##   - HA risk: Both replicas of one ES shard could be scheduled on the same node; if that node fails,
+##     both replicas are lost.
+##   - AWS AZ issue: Pods can get "stuck" in a specific AZ even if you add nodes in other AZs, since
+##     EBS volumes (PVCs) are not automatically moved between AZs.
+##   - Changing from "soft" to "hard" in existing clusters may cause scheduling issues if there are
+##     insufficient nodes to satisfy the hard anti-affinity requirement.
+antiAffinity: soft
+
+## Set pod anti-affinity topology key (optional).
+# antiAffinityTopologyKey: "kubernetes.io/hostname"
+
+## Settings below:
+## 1. Enable basic auth
+## 2. Enable Transport SSL, and mount use istio generated certificates
+## Transport SSL is for ES pod to ES pod communication
+## HTTP SSL (client to ES pod) remains off, and is handled by istio-proxy sidecar
+esConfig:
+  elasticsearch.yml: |
+    xpack.security.enabled: true
+    xpack.security.transport.ssl.enabled: true
+    xpack.security.transport.ssl.key: /usr/share/elasticsearch/config/certs/key.pem
+    xpack.security.transport.ssl.certificate: /usr/share/elasticsearch/config/certs/cert-chain.pem
+    xpack.security.transport.ssl.certificate_authorities: /usr/share/elasticsearch/config/certs/root-cert.pem
+    xpack.security.transport.ssl.verification_mode: certificate
+    node.store.allow_mmap: false
+
+## Additional pod annotations:
+## 1. Mount a emptyDir volume to the istio-proxy sidecar, and tell it to export certificates for us.
+## 2. Do not proxy traffic on the ES transport port (used for ES pod to ES pod communication). This traffic is encrypted by ES.
+podAnnotations:
+  sidecar.istio.io/userVolumeMount: '[{"name": "istio-certs", "mountPath": "/etc/istio-output-certs"}]'
+  proxy.istio.io/config: |
+    proxyMetadata:
+      OUTPUT_CERTS: /etc/istio-output-certs
+  traffic.sidecar.istio.io/includeInboundPorts: "*"
+  traffic.sidecar.istio.io/excludeOutboundPorts: "9300"
+  traffic.sidecar.istio.io/excludeInboundPorts: "9300"
+
+## Volume used to pass istio certificates to the main container.
+extraVolumeMounts:
+  - name: istio-certs
+    mountPath: /usr/share/elasticsearch/config/certs
+    readOnly: true
+extraVolumes:
+  - name: istio-certs
+    emptyDir: {}
+
+volumeClaimTemplate:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 5Gi
+
+persistence:
+  annotations:
+    argocd.argoproj.io/sync-options: Delete=false
