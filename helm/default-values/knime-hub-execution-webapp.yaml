@@ -1,0 +1,14 @@
+####################################################################################################
+# THIS FILE IS INTENDED TO BE MAINTAINED BY KNIME. SPECIFY OVERRIDES IN THE MAIN VALUES.YAML FILE. #
+####################################################################################################
+
+csp_statement: default-src 'self'; script-src 'unsafe-inline' 'unsafe-eval' 'self'; style-src 'unsafe-inline' 'self'; img-src 'self' data:; font-src 'self' data:;
+
+deployment:
+  customizations:
+    enabled: true
+    site_title: Data Apps Portal
+    # logo_svg: ""
+
+istio:
+  ingressGatewayService: istio-ingressgateway
