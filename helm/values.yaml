@@ -386,3 +386,13 @@ s3:
   executionBucket: knimehub-execution-893471991455-us-east-1
   avatarsBucket: knimehub-avatars-893471991455-us-east-1
   secretStoreBucket: knimehub-secret-store-893471991455-us-east-1
+
+knime-hub-istio-ingressgateway:
+  overrides:
+    gateway:
+      service:
+        type: LoadBalancer
+        annotations:
+          service.beta.kubernetes.io/aws-load-balancer-type: nlb
+      imagePullSecrets:
+        - name: regcred
