@@ -59,7 +59,7 @@ argocd:
 global:
   ## Regardless of where TLS is terminated, so long as TLS is enabled, `.global.tls.enabled` should be set to `true`.
   tls:
-    enabled: false
+    enabled: true
   caCertificate:
     enabled: false
     configMapName: knime-business-hub-custom-ca-bundle
