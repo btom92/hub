@@ -431,6 +431,7 @@ oauth2FlowService:
 
 storage-ingressgateway:
   enabled: true
+  targetRevision: "1.28.3"
   chartName: knime-hub-istio-ingressgateway
   namespace: istio-system
   syncWave: 200
@@ -452,3 +453,4 @@ storage-ingressgateway:
 
       podAnnotations:
         sidecar.istio.io/inject: "false"
+
