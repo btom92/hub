@@ -305,7 +305,7 @@ knime-hub-infrastructure:
         enabled: true
         httpsRedirectEnabled: false
         tlsTermination:
-          enabled: false
+          enabled: true
           mode: SIMPLE
           ## If TLS termination is enabled, the TLS Secret must exist in the same namespace as the Istio Ingress Gateway.
           secretName: business-hub-certificate
