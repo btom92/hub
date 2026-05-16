@@ -298,18 +298,15 @@ knime-hub-business-hub-certificate:
 
 knime-hub-infrastructure:
   overrides:
-    ## Ingress is fulfilled by the Istio Ingress Gateway.
     ingress:
-      ## Customer TODO: Configure the Istio Ingress Gateway settings as needed. See helm/default-values/knime-hub-infrastructure.yaml for additional options.
       gateway:
         enabled: true
         httpsRedirectEnabled: false
         tlsTermination:
           enabled: true
           mode: SIMPLE
-          ## If TLS termination is enabled, the TLS Secret must exist in the same namespace as the Istio Ingress Gateway.
           secretName: business-hub-certificate
-          meshRouting:
+    meshRouting:
       virtualService:
         http:
           - match:
@@ -336,6 +333,7 @@ knime-hub-infrastructure:
                   host: secret-store
                   port:
                     number: 80
+
 
 knime-hub-keycloak:
   overrides:
