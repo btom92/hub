@@ -390,6 +390,21 @@ secretStoreService:
 
 s3: {}
 
+secretStore:
+  minio:
+    enabled: true
+    endpoint: http://minio.minio.svc.cluster.local:9000
+    accessKey: knime
+    secretKey: ef324be58e29854c8aba322688477ddf
+    secure: false
+    region: us-east-1
+    buckets:
+      artifacts: knimehub-artifacts-893471991455
+      avatars: knimehub-avatars-893471991455-us-east-1
+      accounts: knimehub-accounts-893471991455-us-east-1
+      catalog: knimehub-catalog-893471991455
+      executionLogs: knimehub-execution-logs-893471991455
+
 knime-hub-istio-ingressgateway:
   overrides:
     gateway:
