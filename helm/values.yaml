@@ -381,12 +381,14 @@ secretStoreService:
     annotations:
       eks.amazonaws.com/role-arn: arn:aws:iam::893471991455:role/knimehub-secret-store-role
 
-s3:
-  catalogBucket: knimehub-catalog-893471991455-us-east-1
-  accountsBucket: knimehub-accounts-893471991455-us-east-1
-  executionBucket: knimehub-execution-893471991455-us-east-1
-  avatarsBucket: knimehub-avatars-893471991455-us-east-1
-  secretStoreBucket: knimehub-secret-store-893471991455-us-east-1
+#s3:
+#  catalogBucket: knimehub-catalog-893471991455-us-east-1
+#  accountsBucket: knimehub-accounts-893471991455-us-east-1
+#  executionBucket: knimehub-execution-893471991455-us-east-1
+#  avatarsBucket: knimehub-avatars-893471991455-us-east-1
+#  secretStoreBucket: knimehub-secret-store-893471991455-us-east-1
+
+s3: {}
 
 knime-hub-istio-ingressgateway:
   overrides:
